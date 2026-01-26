@@ -1,13 +1,9 @@
 
 import colour
 import numpy as np
+import sys
 
-INPUT = "#513B72"
-COMPARE = "#b888ff"
 TARGET_Y = 0.34937594007454498
-
-
-type Colour = tuple[float, float, float]
 
 
 def string_to_rgb(hex_str: str):
@@ -24,11 +20,12 @@ def rgb_to_string(rgb):
     return "#"+r+g+b
 
 
-def adjust_l(oklch, steps):
+def adjust_y(oklch, steps):
     for _ in range(steps):
         xyz = colour.convert(oklch, "oklch", "cie xyz")
         xyz[1] = TARGET_Y
         oklch[0] = colour.convert(xyz, "cie xyz", "oklch")[0]
+        print(xyz[1])
 
 
 def get_y_from_rgb(rgb):
@@ -51,19 +48,20 @@ def adjust_c(oklch, steps):
             l = m
         else:
             r = m
+        print(r - l)
     oklch[1] = l
 
 
 def main():
-    print(INPUT)
-    input_rgb = string_to_rgb(INPUT)
+    to_boost = sys.argv[1]
+    input_rgb = string_to_rgb(to_boost)
     oklch = colour.convert(input_rgb, "srgb", "oklch")
-    for i in range(100):
-        adjust_l(oklch, 100)
+    for i in range(3):
+        adjust_y(oklch, 100)
         adjust_c(oklch, 100)
     boosted_rgb = colour.convert(oklch, "oklch", "srgb")
     print(rgb_to_string(boosted_rgb))
-    print(get_y_from_rgb(boosted_rgb))
+    print(get_y_from_rgb(boosted_rgb) - TARGET_Y)
 
 
 if __name__ == "__main__":
