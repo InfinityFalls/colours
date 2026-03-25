@@ -37,7 +37,6 @@ def adjust_c(oklch, steps):
             l = m
         else:
             r = m
-        print(r - l)
     oklch[1] = l
 
 
@@ -46,4 +45,18 @@ def adjust_y(oklch, steps, target_y):
         xyz = colour.convert(oklch, "oklch", "cie xyz")
         xyz[1] = target_y
         oklch[0] = colour.convert(xyz, "cie xyz", "oklch")[0]
-        print(xyz[1])
+        
+        
+def contrast(fg: float, bg: float):
+    c = 1.14
+    if bg > fg:
+        c *= bg ** 0.56 - fg ** 0.57
+    else:
+        c *= bg ** 0.65 - fg ** 0.62
+    
+    c = abs(c)
+    if abs(c) < 0.1:
+        return 0
+    else:
+        c += 0.027
+    return c * 100
